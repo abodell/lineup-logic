@@ -1,2 +1,2 @@
 httpx
-supabase-py
+supabase
