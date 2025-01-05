@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-from schemas.auth import UserCredentials
+from app.schemas.auth import UserCredentials
 from app.services.supabase_client import supabase
 
 

@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import auth
+from app.routers import auth, sleeper
 
 app = FastAPI()
 
@@ -15,3 +15,8 @@ app.add_middleware(
 
 # Include routes
 app.include_router(auth.router)
+app.include_router(sleeper.router)
+
+@app.get('/')
+def home():
+    return {'message': 'hello'}
