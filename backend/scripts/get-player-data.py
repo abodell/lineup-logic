@@ -48,7 +48,7 @@ def insert_to_supabase(data):
             records.append(record)
 
         # Perform bulk upsert
-        response = supabase.table("your_table_name").upsert(records).execute()
+        response = supabase.table("players").upsert(records).execute()
         if response.status_code != 201:
             print(f"Failed to upsert records: {response.data}")
         else:
