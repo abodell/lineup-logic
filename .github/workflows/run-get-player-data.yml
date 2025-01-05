@@ -25,7 +25,6 @@ jobs:
       - name: Run Get Player Data
         run: |
           python backend/scripts/get-player-data.py
-          python sleeper_to_supabase.py
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DATABASE_KEY: ${{ secrets.DATABASE_KEY }}
