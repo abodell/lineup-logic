@@ -27,5 +27,5 @@ jobs:
           python backend/scripts/get-player-data.py
           python sleeper_to_supabase.py
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          SUPABASE_URL: ${{ secrets.DATABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.DATABASE_KEY }}
