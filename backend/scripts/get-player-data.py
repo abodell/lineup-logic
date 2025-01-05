@@ -45,6 +45,7 @@ def insert_to_supabase(data):
                 "sport": player_data["sport"],
                 "birth_country": player_data["birth_country"]
             }
+            print(record['number'])
             records.append(record)
 
         # Perform bulk upsert
