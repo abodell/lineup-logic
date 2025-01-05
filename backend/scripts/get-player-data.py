@@ -58,6 +58,8 @@ def insert_to_supabase(data):
 
 if __name__ == "__main__":
     client = httpx.Client(base_url='https://api.sleeper.app/v1')
+    if not os.getenv('DATABASE_URL') or not os.getenv('DATABASE_KEY'):
+        print('Environment Secrets not fetched!')
     supabase: Client = create_client(os.getenv('DATABASE_URL'), os.getenv('DATABASE_KEY'))
     try:
         data = get_sleeper_data()
