@@ -93,6 +93,9 @@ class SleeperAPIClient:
         response = await self.client.get(f'/draft/{draft_id}/traded_picks')
         return response.json()
     
-    
+    async def get_sleeper_players(self):
+        print('get_sleeper_players')
+        response = await self.client.get(f'/players/nfl')
+        return response.json()
 
 sleeper_client = SleeperAPIClient()
