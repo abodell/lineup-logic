@@ -193,3 +193,19 @@ async def get_draft(draft_id: str):
     except HTTPException as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)
     
+@router.get('/sleeper/players')
+async def get_players(first_name: str = Query(None), last_name: str = Query(None), player_id: str = Query(None)):
+    try:
+        if (first_name and last_name):
+            players = await sleeper_client.get_sleeper_player_by_name(first_name, last_name)
+        elif (player_id):
+            players = await sleeper_client.get_sleeper_player_by_id(player_id)
+        else:
+            players = await sleeper_client.get_all_sleeper_players()
+        
+        if not players:
+            raise HTTPException(status_code=404, detail="No players found!")
+        return players
+    except HTTPException as e:
+        print("Error occured:", e)
+        raise HTTPException(status_code=e, detail=e.detail)

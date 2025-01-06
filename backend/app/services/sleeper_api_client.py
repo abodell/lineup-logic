@@ -1,10 +1,11 @@
 import httpx
+from app.services.supabase_client import create_supabase
 
 class SleeperAPIClient:
     BASE_URL = 'https://api.sleeper.app/v1'
 
     def __init__(self):
-        self.client = httpx.AsyncClient(base_url=self.BASE_URL)
+        self.client = httpx.AsyncClient(base_url=self.BASE_URL)    
     
     async def get_sleeper_user_by_username(self, username: str):
         response = await self.client.get(f'/user/{username}')
@@ -93,9 +94,23 @@ class SleeperAPIClient:
         response = await self.client.get(f'/draft/{draft_id}/traded_picks')
         return response.json()
     
-    async def get_sleeper_players(self):
-        print('get_sleeper_players')
-        response = await self.client.get(f'/players/nfl')
-        return response.json()
+    async def get_all_sleeper_players(self):
+        print('get_all_sleeper_players')
+        supabase_async = await create_supabase()
+        response = await supabase_async.table('players').select("*").execute()
+        return response.data
+    
+    async def get_sleeper_player_by_name(self, first_name: str, last_name: str):
+        print('get_sleeper_player_by_name')
+        supabase_async = await create_supabase()
+        response = await supabase_async.table('players').select('*').ilike('first_name', first_name).ilike('last_name', last_name).execute()
+        return response.data
+    
+    async def get_sleeper_player_by_id(self, player_id: str):
+        print('get_sleeper_player_by_id')
+        supabase_async = await create_supabase()
+        response = await supabase_async.table('players').select('*').ilike('player_id', player_id).execute()
+        return response.data
+
 
 sleeper_client = SleeperAPIClient()
