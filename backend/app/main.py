@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import auth, sleeper
+from app.routers import auth, sleeper, espn
 
 app = FastAPI()
 
@@ -16,6 +16,7 @@ app.add_middleware(
 # Include routes
 app.include_router(auth.router)
 app.include_router(sleeper.router)
+app.include_router(espn.router)
 
 @app.get('/')
 def home():
