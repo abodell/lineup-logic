@@ -192,6 +192,23 @@ async def get_draft(draft_id: str):
         return draft
     except HTTPException as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)
+
+@router.get('/sleeper/players/trending/{type}')
+async def get_trending_players(type: str, lookback_hours: int = Query(None), limit: int = Query(None)):
+    if not type:
+        raise HTTPException(status_code=400, detail="Must provide a type (add/drop)!")
+    
+    if not lookback_hours:
+        lookback_hours = 24
+    
+    if not limit:
+        limit = 25
+    
+    try:
+        trending_players = await sleeper_client.get_sleeper_trending_players(type, lookback_hours, limit)
+        return trending_players
+    except HTTPException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
     
 @router.get('/sleeper/players')
 async def get_players(first_name: str = Query(None), last_name: str = Query(None), player_id: str = Query(None)):

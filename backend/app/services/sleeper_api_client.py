@@ -111,6 +111,10 @@ class SleeperAPIClient:
         supabase_async = await create_supabase()
         response = await supabase_async.table('players').select('*').ilike('player_id', player_id).execute()
         return response.data
-
+    
+    async def get_sleeper_trending_players(self, type: str, lookback_hours: int, limit: int):
+        print('get_sleeper_trending_players')
+        response = await self.client.get(f'/players/nfl/trending/{type}?lookback_hours={lookback_hours}&limit={limit}')
+        return response.json()
 
 sleeper_client = SleeperAPIClient()
