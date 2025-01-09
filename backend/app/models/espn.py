@@ -1,7 +1,8 @@
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Optional
+from datetime import datetime
 
-class ESPNPlayer(BaseModel):
+class Player(BaseModel):
     name: str
     playerId: int
     posRank: int # players positional rank
@@ -14,10 +15,10 @@ class ESPNPlayer(BaseModel):
     position: str # main position like 'TE' or 'QB'
     injuryStatus: str
     injured: bool
-    total_points: int # players total points during the season
-    avg_points: int # players average points during the season
-    projected_total_points: int # projected player points for the season
-    projected_avg_points: int # projected players average points for the season
+    total_points: float # players total points during the season
+    avg_points: float # players average points during the season
+    projected_total_points: float # projected player points for the season
+    projected_avg_points: float # projected players average points for the season
     percent_owned: int # percentage player is rostered
     percent_started: int # percentage player is started
     stats: dict # holds each week stats, actual and projected points. 
@@ -49,14 +50,24 @@ class ESPNTeam(BaseModel):
     draft_projected_rank: int # projected rank after draft
     playoff_pct: int # teams projected chance to make playoffs
     logo_url: str
-    roster: List[ESPNPlayer]
+    roster: List[Player]
 
     # These 3 variables will have the same index and match on those indexes
     schedule: List["ESPNTeam"] = Field(default=None, description="Schedule of opponents")
     scores: List[int]
     outcomes: List[str]
 
-ESPNTeam.model_rebuild()
+class BoxPlayer(BaseModel):
+    name: str
+    slot_position: str # the players lineup position
+    points: float # points scored in the current week
+    projected_points: float # projected points for that week
+    pro_opponent: str # the pro team the player is going against
+    pro_pos_rank: int # the rank the pro team is against that players position
+    game_played: int # 0 (not played/playing) or 100 (finished game)
+    game_date: Optional[datetime] # datetime object of when the pro game starts
+    on_bye_week: bool # whether or not the player is on a bye
+    active_status: str 
 
 class ESPNBoxScore(BaseModel):
     home_team: ESPNTeam
@@ -65,8 +76,8 @@ class ESPNBoxScore(BaseModel):
     away_team: ESPNTeam
     away_score: int
     away_projected: int
-    home_lineup: List[ESPNPlayer]
-    away_lineup: List[ESPNPlayer]
+    home_lineup: List[Player]
+    away_lineup: List[Player]
     is_playoff: bool
     matchup_type: str
 
@@ -74,6 +85,7 @@ class TeamScoreboard(BaseModel):
     team_name: str
     team_score: float
     projected: float
+    lineup: List[BoxPlayer]
 
 class MatchupScoreboard(BaseModel):
     home_team: TeamScoreboard

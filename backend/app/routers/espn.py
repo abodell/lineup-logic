@@ -1,7 +1,11 @@
 from fastapi import APIRouter, Query, HTTPException, Depends
+from app.models.espn import MatchupScoreboard, TeamScoreboard, BoxPlayer, WeekScoreboard
 from fastapi.responses import JSONResponse
-from app.models.espn import ESPNTeam, ESPNPlayer, ESPNBoxScore, MatchupScoreboard, TeamScoreboard, WeekScoreboard
 from espn_api.football import League
+from espn_api.football.box_score import BoxScore
+from espn_api.football.player import Player
+from typing import List
+
 
 router = APIRouter()
 
@@ -34,21 +38,45 @@ async def get_league_scores_by_week(week: int, manager: LeagueManager = Depends(
         raise HTTPException(status_code=400, detail="Please provide the week!")
 
     # create Pydantic models for the objects that will be returned for cleaner handling
-    box_scores = manager.league.box_scores(week)
-    formatted_box_scores = []
-    for matchup in box_scores:
-        matchup: ESPNBoxScore
-        formatted_box_scores.append(MatchupScoreboard(
+    matchups: List[BoxScore] = manager.league.box_scores(week)
+    scoreboard = []
+    for matchup in matchups:
+        scoreboard.append(MatchupScoreboard(
             home_team = TeamScoreboard(
                 team_name = matchup.home_team.team_name,
                 team_score = matchup.home_score,
-                projected = round(matchup.home_projected, 2)
+                projected = matchup.home_projected,
+                lineup = [BoxPlayer(
+                    name = player.name,
+                    slot_position = player.slot_position,
+                    points = player.points,
+                    projected_points = player.projected_points,
+                    pro_opponent = player.pro_opponent,
+                    pro_pos_rank = player.pro_pos_rank,
+                    game_played = player.game_played,
+                    game_date = getattr(player, 'game_date', None),
+                    on_bye_week = player.on_bye_week,
+                    active_status = player.active_status
+                ) for player in matchup.home_lineup]
             ),
             away_team = TeamScoreboard(
                 team_name = matchup.away_team.team_name,
                 team_score = matchup.away_score,
-                projected = round(matchup.away_projected, 2)
-            ))
-        )
-    
-    return WeekScoreboard(scores = formatted_box_scores)
+                projected = matchup.away_projected,
+                lineup = [BoxPlayer(
+                    name = player.name,
+                    slot_position = player.slot_position,
+                    points = player.points,
+                    projected_points = player.projected_points,
+                    pro_opponent = player.pro_opponent,
+                    pro_pos_rank = player.pro_pos_rank,
+                    game_played = player.game_played,
+                    game_date = getattr(player, 'game_date', None),
+                    on_bye_week = player.on_bye_week,
+                    active_status = player.active_status
+                ) for player in matchup.away_lineup]
+            )
+        ))
+
+    return WeekScoreboard(scores=scoreboard)
+
