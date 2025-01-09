@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Query, HTTPException, Depends
 from fastapi.responses import JSONResponse
+from app.models.espn import ESPNTeam, ESPNPlayer, ESPNBoxScore, MatchupScoreboard, TeamScoreboard, WeekScoreboard
 from espn_api.football import League
 
 router = APIRouter()
@@ -24,7 +25,7 @@ async def get_league(league_id: str = Query(None), year: int = Query(None), espn
     except Exception as e:
         raise Exception(e)
     
-@router.get('/espn/leagues/scores/{week}')
+@router.get('/espn/leagues/scoreboard/{week}')
 async def get_league_scores_by_week(week: int, manager: LeagueManager = Depends(get_league_manager)):
     if not manager.league:
         raise HTTPException(status_code=404, detail="Your league must be connected first!")
@@ -36,15 +37,18 @@ async def get_league_scores_by_week(week: int, manager: LeagueManager = Depends(
     box_scores = manager.league.box_scores(week)
     formatted_box_scores = []
     for matchup in box_scores:
-        formatted_box_scores.append({
-            "home_team": {
-                "name": matchup.home_team.team_name,
-                "score": matchup.home_score
-            },
-            "away_team": {
-                "name": matchup.away_team.team_name,
-                "score": matchup.away_score
-            }
-        })
+        matchup: ESPNBoxScore
+        formatted_box_scores.append(MatchupScoreboard(
+            home_team = TeamScoreboard(
+                team_name = matchup.home_team.team_name,
+                team_score = matchup.home_score,
+                projected = round(matchup.home_projected, 2)
+            ),
+            away_team = TeamScoreboard(
+                team_name = matchup.away_team.team_name,
+                team_score = matchup.away_score,
+                projected = round(matchup.away_projected, 2)
+            ))
+        )
     
-    return JSONResponse({"week": week, "scores": formatted_box_scores}, status_code=200)
+    return WeekScoreboard(scores = formatted_box_scores)
