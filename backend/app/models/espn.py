@@ -87,6 +87,9 @@ class ESPNTeam(BaseModel):
     class Config:
         from_attributes = True
 
+class LeagueRankings(BaseModel):
+    teams: List[TeamInfo]
+
 class LeagueTeams(BaseModel):
     teams: List[ESPNTeam]
 
