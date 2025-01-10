@@ -25,6 +25,18 @@ class Player(BaseModel):
     class Config:
         from_attributes = True
 
+class PlayerInfo(BaseModel):
+    name: str
+    playerId: int
+    posRank: int
+    lineupSlot: str
+    proTeam: str
+    position: str
+    total_points: float # players total points during the season
+    avg_points: float # players average points during the season
+    projected_total_points: float # projected player points for the season
+    projected_avg_points: float # projected players average points for the season
+
 class TeamInfo(BaseModel):
     team_name: str
     wins: int
@@ -65,7 +77,7 @@ class ESPNTeam(BaseModel):
     final_standing: int # final standing at end of season
     draft_projected_rank: int # projected rank after draft
     playoff_pct: float # teams projected chance to make playoffs
-    roster: List[Player]
+    roster: List[PlayerInfo]
 
     # These 3 variables will have the same index and match on those indexes
     schedule: List[TeamInfo] = Field(default=None, description="Schedule of opponents")

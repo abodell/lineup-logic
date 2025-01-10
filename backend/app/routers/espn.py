@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Query, HTTPException, Depends
-from app.models.espn import MatchupScoreboard, TeamScoreboard, BoxPlayer, WeekScoreboard, LeagueTeams, ESPNTeam, Player, TeamInfo
+from app.models.espn import MatchupScoreboard, TeamScoreboard, BoxPlayer, WeekScoreboard, LeagueTeams, ESPNTeam, PlayerInfo, TeamInfo
 from fastapi.responses import JSONResponse
 from espn_api.football import League
 from espn_api.football.box_score import BoxScore
@@ -28,6 +28,19 @@ async def get_league(league_id: str = Query(None), year: int = Query(None), espn
     except Exception as e:
         raise Exception(e)
     
+@router.get('/espn/leagues/teams/{id}')
+async def get_team_by_id(manager: LeagueManager = Depends(get_league_manager)):
+    if not manager.league:
+        raise HTTPException(status_code=404, detail="Your league must be connected first!")
+    
+    team = manager.league.get_team_data(1)
+
+    return ESPNTeam(
+        **{key: value for key, value in team.__dict__.items() if key != 'schedule' and key != 'roster'},  # Unpack all except schedule and roster
+        schedule=[TeamInfo.model_validate(opponent, from_attributes=True) for opponent in team.schedule], # Override schedule
+        roster = [PlayerInfo.model_validate(player, from_attributes=True) for player in team.roster]
+    )
+    
 @router.get('/espn/leagues/teams')
 async def get_teams(manager: LeagueManager = Depends(get_league_manager)):
     if not manager.league:
@@ -36,10 +49,11 @@ async def get_teams(manager: LeagueManager = Depends(get_league_manager)):
     team_list = [ESPNTeam(
         **{key: value for key, value in team.__dict__.items() if key != 'schedule' and key != 'roster'},  # Unpack all except schedule and roster
         schedule=[TeamInfo.model_validate(opponent, from_attributes=True) for opponent in team.schedule], # Override schedule
-        roster = [Player.model_validate(player, from_attributes=True) for player in team.roster] # override roster
+        roster = [PlayerInfo.model_validate(player, from_attributes=True) for player in team.roster] # override roster
     ) for team in manager.league.teams]
 
     return LeagueTeams(teams = team_list)
+
 @router.get('/espn/leagues/scoreboard/{week}')
 async def get_league_scores_by_week(week: int, manager: LeagueManager = Depends(get_league_manager)):
     if not manager.league:
