@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 from typing import List, Optional
 from datetime import datetime
 
@@ -6,7 +6,7 @@ class Player(BaseModel):
     name: str
     playerId: int
     posRank: int # players positional rank
-    eligibleSlots: List[str] # example ['WR', 'WR/TE/RB']
+    eligibleSlots: List[str | None] # example ['WR', 'WR/TE/RB']
     lineupSlot: str # the players lineup position
     acquisitionType: str
     proTeam: str # 'PIT' or 'LAR'
@@ -19,21 +19,38 @@ class Player(BaseModel):
     avg_points: float # players average points during the season
     projected_total_points: float # projected player points for the season
     projected_avg_points: float # projected players average points for the season
-    percent_owned: int # percentage player is rostered
-    percent_started: int # percentage player is started
-    stats: dict # holds each week stats, actual and projected points. 
+    percent_owned: float # percentage player is rostered
+    percent_started: float # percentage player is started
+
+    class Config:
+        from_attributes = True
+
+class TeamInfo(BaseModel):
+    team_name: str
+    wins: int
+    losses: int
+    ties: int
+    team_abbrev: str
+    streak_type: str
+    streak_length: int
+    standing: int
+    final_standing: int
+    playoff_pct: float
+
+    class Config:
+        from_atrributes = True
 
 class ESPNTeam(BaseModel):
     team_id: int
     team_abbrev: str
     team_name: str
-    division_id: str
+    division_id: int
     division_name: str
     wins: int
     losses: int
     ties: int
-    points_for: int # total points for through out the season
-    points_against: int # total points against through out the season
+    points_for: float # total points for through out the season
+    points_against: float # total points against through out the season
     waiver_rank: int # waiver position
     acquisitions: int # number of acquisitions made by the team
     acquisition_budget_spent: int # budget spent on acquisitions 
@@ -42,20 +59,24 @@ class ESPNTeam(BaseModel):
     move_to_ir: int # number of players move to ir
     owners: List[dict] # array of owner dict example: { id: '1234', displayName: 'team', firstName: 'Bob', lastName: 'Joe'} 
     # Note for owners name attributes will only be available for private leagues. Public leagues will not show name data.
-    stats: dict # holds teams season long stats
     streak_type: str # string of either WIN or LOSS
     streak_length: int # how long the streak is for streak type
     standing: int # standing before playoffs
     final_standing: int # final standing at end of season
     draft_projected_rank: int # projected rank after draft
-    playoff_pct: int # teams projected chance to make playoffs
-    logo_url: str
+    playoff_pct: float # teams projected chance to make playoffs
     roster: List[Player]
 
     # These 3 variables will have the same index and match on those indexes
-    schedule: List["ESPNTeam"] = Field(default=None, description="Schedule of opponents")
-    scores: List[int]
-    outcomes: List[str]
+    schedule: List[TeamInfo] = Field(default=None, description="Schedule of opponents")
+    scores: List[float]
+    outcomes: List[str | None]
+
+    class Config:
+        from_attributes = True
+
+class LeagueTeams(BaseModel):
+    teams: List[ESPNTeam]
 
 class BoxPlayer(BaseModel):
     name: str
