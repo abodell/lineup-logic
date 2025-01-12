@@ -34,7 +34,7 @@ class PlayerInfo(BaseModel):
     projected_total_points: float # projected player points for the season
     projected_avg_points: float # projected players average points for the season
 
-class WaiverWire(BaseModel):
+class PlayerList(BaseModel):
     waiver_wire: List[PlayerInfo]
 
 class DraftPick(BaseModel):

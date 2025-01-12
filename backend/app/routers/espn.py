@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Query, HTTPException, Depends
-from app.models.espn import MatchupScoreboard, TeamScoreboard, BoxPlayer, WeekScoreboard, LeagueTeams, ESPNTeam, PlayerInfo, TeamInfo, LeagueRankings, DraftPick, Draft, WaiverWire
+from app.models.espn import MatchupScoreboard, TeamScoreboard, BoxPlayer, WeekScoreboard, LeagueTeams, ESPNTeam, PlayerInfo, TeamInfo, LeagueRankings, DraftPick, Draft, PlayerList
 from fastapi.responses import JSONResponse
 from espn_api.football import League
 from espn_api.football.box_score import BoxScore
-from typing import List
+from typing import List, Literal
 
 
 router = APIRouter()
@@ -77,6 +77,20 @@ async def get_team_by_id(id: int, manager: LeagueManager = Depends(get_league_ma
         schedule=[TeamInfo.model_validate(opponent, from_attributes=True) for opponent in team.schedule], # Override schedule
         roster = [PlayerInfo.model_validate(player, from_attributes=True) for player in team.roster]
     )
+
+@router.get('/espn/leagues/teams/scoring/{type}')
+async def get_scoring_data(type: Literal["most", "least"], manager: LeagueManager = Depends(get_league_manager)):
+    if not manager.league:
+        raise HTTPException(status_code=404, detail="Your league must be connected first!")
+    
+    team: TeamInfo
+
+    if type == "least":
+        team = manager.league.least_scorer()
+    elif type == "most":
+        team = manager.league.top_scorer()
+    
+    return TeamInfo.model_validate(team, from_attributes = True)
     
 @router.get('/espn/leagues/teams')
 async def get_teams(manager: LeagueManager = Depends(get_league_manager)):
@@ -105,10 +119,9 @@ async def get_waiver_wire(week: int = Query(None), size: int = Query(None), posi
 
     params = {key: value for key, value in params.items() if value is not None}
 
-    waiver_wire = [PlayerInfo.model_validate(player, from_attributes = True) for player in manager.league.free_agents(params)]
+    waiver_wire = [PlayerInfo.model_validate(player, from_attributes = True) for player in manager.league.free_agents(**params)]
 
-    return WaiverWire(waiver_wire = waiver_wire)
-
+    return PlayerList(waiver_wire = waiver_wire)
 
 @router.get('/espn/leagues/scoreboard/{week}')
 async def get_league_scores_by_week(week: int, manager: LeagueManager = Depends(get_league_manager)):
