@@ -44,10 +44,26 @@ async def get_draft(manager: LeagueManager = Depends(get_league_manager)):
 async def get_team_rankings(week: int, manager: LeagueManager = Depends(get_league_manager)):
     if not manager.league:
         raise HTTPException(status_code=404, detail="Your league must be connected first!")
-    
+
     rankings = [TeamInfo.model_validate(team[1], from_attributes=True) for team in manager.league.power_rankings(week)]
 
     return LeagueRankings(teams = rankings)
+
+@router.get('/espn/leagues/teams/standings')
+async def get_league_standings(week: int = Query(None), manager: LeagueManager = Depends(get_league_manager)):
+    if not manager.league:
+        raise HTTPException(status_code=404, detail="Your league must be connected first!")
+    
+    standings = []
+    
+    if week:
+        for team in manager.league.standings_weekly(week):
+            standings.append(TeamInfo.model_validate(team, from_attributes = True))
+    else:
+        for team in manager.league.standings():
+            standings.append(TeamInfo.model_validate(team, from_attributes = True))
+    
+    return LeagueRankings(teams = standings)
     
 @router.get('/espn/leagues/teams/{id}')
 async def get_team_by_id(id: int, manager: LeagueManager = Depends(get_league_manager)):
