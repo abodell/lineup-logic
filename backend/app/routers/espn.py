@@ -114,7 +114,7 @@ async def get_team_by_id(id: int, manager: LeagueManager = Depends(get_league_ma
     )
 
 @router.get('/espn/leagues/teams/scoring/{type}')
-async def get_scoring_data(type: Literal["most", "least"], manager: LeagueManager = Depends(get_league_manager)):
+async def get_scoring_data(type: Literal["most", "least", "against"], manager: LeagueManager = Depends(get_league_manager)):
     if not manager.league:
         raise HTTPException(status_code=404, detail="Your league must be connected first!")
     
@@ -124,6 +124,8 @@ async def get_scoring_data(type: Literal["most", "least"], manager: LeagueManage
         team = manager.league.least_scorer()
     elif type == "most":
         team = manager.league.top_scorer()
+    elif type == "against":
+        team = manager.league.most_points_against()
     
     return TeamInfo.model_validate(team, from_attributes = True)
     
