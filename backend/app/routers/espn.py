@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Query, HTTPException, Depends
-from app.models.espn import MatchupScoreboard, TeamScoreboard, BoxPlayer, WeekScoreboard, LeagueTeams, ESPNTeam, PlayerInfo, TeamInfo, LeagueRankings, DraftPick, Draft
+from app.models.espn import MatchupScoreboard, TeamScoreboard, BoxPlayer, WeekScoreboard, LeagueTeams, ESPNTeam, PlayerInfo, TeamInfo, LeagueRankings, DraftPick, Draft, WaiverWire
 from fastapi.responses import JSONResponse
 from espn_api.football import League
 from espn_api.football.box_score import BoxScore
@@ -90,6 +90,25 @@ async def get_teams(manager: LeagueManager = Depends(get_league_manager)):
     ) for team in manager.league.teams]
 
     return LeagueTeams(teams = team_list)
+
+@router.get('/espn/leagues/waivers')
+async def get_waiver_wire(week: int = Query(None), size: int = Query(None), position: str = Query(None), position_id: int = Query(None), manager: LeagueManager = Depends(get_league_manager)):
+    if not manager.league:
+        raise HTTPException(status_code=404, detail="Your league must be connected first!")
+    
+    params = {
+        "week": week,
+        "size": size,
+        "position": position,
+        "position_id": position_id
+    }
+
+    params = {key: value for key, value in params.items() if value is not None}
+
+    waiver_wire = [PlayerInfo.model_validate(player, from_attributes = True) for player in manager.league.free_agents(params)]
+
+    return WaiverWire(waiver_wire = waiver_wire)
+
 
 @router.get('/espn/leagues/scoreboard/{week}')
 async def get_league_scores_by_week(week: int, manager: LeagueManager = Depends(get_league_manager)):
