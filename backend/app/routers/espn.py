@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Query, HTTPException, Depends
-from app.models.espn import MatchupScoreboard, TeamScoreboard, BoxPlayer, WeekScoreboard, LeagueTeams, ESPNTeam, PlayerInfo, TeamInfo, LeagueRankings
+from app.models.espn import MatchupScoreboard, TeamScoreboard, BoxPlayer, WeekScoreboard, LeagueTeams, ESPNTeam, PlayerInfo, TeamInfo, LeagueRankings, DraftPick, Draft
 from fastapi.responses import JSONResponse
 from espn_api.football import League
 from espn_api.football.box_score import BoxScore
@@ -27,6 +27,18 @@ async def get_league(league_id: str = Query(None), year: int = Query(None), espn
         return JSONResponse(content = res_content, status_code=200)
     except Exception as e:
         raise Exception(e)
+
+@router.get('/espn/leagues/draft')
+async def get_draft(manager: LeagueManager = Depends(get_league_manager)):
+    if not manager.league:
+        raise HTTPException(status_code=404, detail="Your league must be connected first!")
+    
+    picks = [DraftPick(
+        **pick.__dict__,
+        team_name = pick.team.team_name
+    ) for pick in manager.league.draft]
+
+    return Draft(draft = picks)
 
 @router.get('/espn/leagues/teams/rankings/{week}')
 async def get_team_rankings(week: int, manager: LeagueManager = Depends(get_league_manager)):

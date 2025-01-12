@@ -22,9 +22,6 @@ class Player(BaseModel):
     percent_owned: float # percentage player is rostered
     percent_started: float # percentage player is started
 
-    class Config:
-        from_attributes = True
-
 class PlayerInfo(BaseModel):
     name: str
     playerId: int
@@ -37,6 +34,15 @@ class PlayerInfo(BaseModel):
     projected_total_points: float # projected player points for the season
     projected_avg_points: float # projected players average points for the season
 
+class DraftPick(BaseModel):
+    round_num: int
+    round_pick: int
+    playerName: str
+    team_name: str
+
+class Draft(BaseModel):
+    draft: List[DraftPick]
+
 class TeamInfo(BaseModel):
     team_name: str
     wins: int
@@ -48,9 +54,6 @@ class TeamInfo(BaseModel):
     standing: int
     final_standing: int
     playoff_pct: float
-
-    class Config:
-        from_atrributes = True
 
 class ESPNTeam(BaseModel):
     team_id: int
@@ -83,9 +86,6 @@ class ESPNTeam(BaseModel):
     schedule: List[TeamInfo] = Field(default=None, description="Schedule of opponents")
     scores: List[float]
     outcomes: List[str | None]
-
-    class Config:
-        from_attributes = True
 
 class LeagueRankings(BaseModel):
     teams: List[TeamInfo]
