@@ -79,7 +79,7 @@ async def get_draft(manager: LeagueManager = Depends(get_league_manager)):
 async def get_team_rankings(week: int, manager: LeagueManager = Depends(get_league_manager)):
     if not manager.league:
         raise HTTPException(status_code=404, detail="Your league must be connected first!")
-
+    
     rankings = [TeamInfo.model_validate(team[1], from_attributes=True) for team in manager.league.power_rankings(week)]
 
     return TeamInfoList(teams = rankings)
@@ -157,6 +157,22 @@ async def get_waiver_wire(week: int = Query(None), size: int = Query(None), posi
     waiver_wire = [PlayerInfo.model_validate(player, from_attributes = True) for player in manager.league.free_agents(**params)]
 
     return PlayerList(waiver_wire = waiver_wire)
+
+@router.get('/espn/leagues/players')
+async def get_player_info(name: str = Query(None), player_id: int = Query(None), manager: LeagueManager = Depends(get_league_manager)):
+    if not manager.league:
+        raise HTTPException(status_code=404, detail="Your league must be connected first!")
+    
+    params = {
+        "name": name,
+        "playerId": player_id
+    }
+
+    params = {key: value for key, value in params.items() if value is not None}
+
+    player = manager.league.player_info(**params)
+
+    return PlayerInfo.model_validate(player, from_attributes = True)
 
 @router.get('/espn/leagues/scoreboard/{week}')
 async def get_league_scores_by_week(week: int, manager: LeagueManager = Depends(get_league_manager)):
