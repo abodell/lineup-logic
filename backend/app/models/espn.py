@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, model_validator
-from typing import List, Optional
+from typing import List, Optional, Union, Tuple
 from datetime import datetime
 
 class Player(BaseModel):
@@ -90,7 +90,20 @@ class ESPNTeam(BaseModel):
     scores: List[float]
     outcomes: List[str | None]
 
-class LeagueRankings(BaseModel):
+class Transaction(BaseModel):
+    team: TeamInfo
+    transaction_type: str
+    player: PlayerInfo
+    additional_data: Union[int, None]
+
+class RecentActivity(BaseModel):
+    actions: List[Transaction]
+    date: datetime
+
+class RecentActivityList(BaseModel):
+    transactions: List[RecentActivity]
+    
+class TeamInfoList(BaseModel):
     teams: List[TeamInfo]
 
 class LeagueTeams(BaseModel):

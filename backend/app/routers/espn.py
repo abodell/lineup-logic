@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Query, HTTPException, Depends
-from app.models.espn import MatchupScoreboard, TeamScoreboard, BoxPlayer, WeekScoreboard, LeagueTeams, ESPNTeam, PlayerInfo, TeamInfo, LeagueRankings, DraftPick, Draft, PlayerList
+from app.models.espn import MatchupScoreboard, TeamScoreboard, BoxPlayer, WeekScoreboard, LeagueTeams, ESPNTeam, PlayerInfo, TeamInfo, TeamInfoList, DraftPick, Draft, PlayerList, Transaction, RecentActivity, RecentActivityList
 from fastapi.responses import JSONResponse
 from espn_api.football import League
 from espn_api.football.box_score import BoxScore
@@ -28,6 +28,41 @@ async def get_league(league_id: str = Query(None), year: int = Query(None), espn
     except Exception as e:
         raise Exception(e)
 
+@router.get('/espn/current-week')
+async def get_current_week(manager: LeagueManager = Depends(get_league_manager)):
+    if not manager.league:
+        raise HTTPException(status_code=404, detail="Your league must be connected first!")
+    
+    return JSONResponse(content = {"current_week": manager.league.current_week})
+
+@router.get('/espn/leagues/recent-activity')
+async def get_recent_activity(size: int = Query(25), msg_type: str = Query(None), offset: int = Query(0), manager: LeagueManager = Depends(get_league_manager)):
+    if not manager.league:
+        raise HTTPException(status_code=404, detail="Your league must be connected first!")
+    
+    params = {
+        "size": size,
+        "msg_type": msg_type,
+        "offset": offset
+    }
+
+    params = {key: value for key, value in params.items() if value is not None}
+    
+    transactions = []
+
+    for activity in manager.league.recent_activity(**params):
+        transactions.append(RecentActivity(
+            actions = [Transaction(
+                team = TeamInfo.model_validate(sub_activity[0], from_attributes = True),
+                transaction_type = sub_activity[1],
+                player = PlayerInfo.model_validate(sub_activity[2], from_attributes = True),
+                additional_data = sub_activity[3]
+            ) for sub_activity in activity.__dict__['actions']],
+            date = activity.__dict__['date']
+        ))
+
+    return RecentActivityList(transactions = transactions)
+
 @router.get('/espn/leagues/draft')
 async def get_draft(manager: LeagueManager = Depends(get_league_manager)):
     if not manager.league:
@@ -47,7 +82,7 @@ async def get_team_rankings(week: int, manager: LeagueManager = Depends(get_leag
 
     rankings = [TeamInfo.model_validate(team[1], from_attributes=True) for team in manager.league.power_rankings(week)]
 
-    return LeagueRankings(teams = rankings)
+    return TeamInfoList(teams = rankings)
 
 @router.get('/espn/leagues/teams/standings')
 async def get_league_standings(week: int = Query(None), manager: LeagueManager = Depends(get_league_manager)):
@@ -63,7 +98,7 @@ async def get_league_standings(week: int = Query(None), manager: LeagueManager =
         for team in manager.league.standings():
             standings.append(TeamInfo.model_validate(team, from_attributes = True))
     
-    return LeagueRankings(teams = standings)
+    return TeamInfoList(teams = standings)
     
 @router.get('/espn/leagues/teams/{id}')
 async def get_team_by_id(id: int, manager: LeagueManager = Depends(get_league_manager)):
