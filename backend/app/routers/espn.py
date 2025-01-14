@@ -1,5 +1,10 @@
 from fastapi import APIRouter, Query, HTTPException, Depends
-from app.models.espn import MatchupScoreboard, TeamScoreboard, BoxPlayer, WeekScoreboard, LeagueTeams, ESPNTeam, PlayerInfo, TeamInfo, TeamInfoList, DraftPick, Draft, PlayerList, Transaction, RecentActivity, RecentActivityList
+from app.models.espn import (
+    MatchupScoreboard, TeamScoreboard, 
+    BoxPlayer, WeekScoreboard, LeagueTeams, 
+    ESPNTeam, PlayerInfo, TeamInfo, TeamInfoList, 
+    DraftPick, Draft, PlayerList, Transaction, 
+    RecentActivity, RecentActivityList)
 from fastapi.responses import JSONResponse
 from espn_api.football import League
 from espn_api.football.box_score import BoxScore
