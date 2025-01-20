@@ -61,7 +61,7 @@ if __name__ == "__main__":
     client = httpx.Client(base_url = 'https://sports.yahoo.com/site/api/resource')
     if not os.getenv('DATABASE_URL') or not os.getenv('DATABASE_KEY'):
         print('Environment Secrets not fetched!')
-    supabase: Client = create_client('https://eovpidzqprlmiupgzkfe.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVvdnBpZHpxcHJsbWl1cGd6a2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU4NjYzMTksImV4cCI6MjA1MTQ0MjMxOX0.QAc9Et4WivQea4Iy6vccNuwyd6HU7_zZfVvgHucnSuU')
+    supabase: Client = create_client(os.getenv('DATABASE_URL'), os.getenv('DATABASE_KEY'))
     data = get_nfl_teams_data()
     parsed_data = parse_teams_data(data)
     try:
