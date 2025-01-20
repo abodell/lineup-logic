@@ -56,8 +56,6 @@ def insert_to_supabase(team_data: dict):
     except Exception as e:
         print(f"Error during bulk upsert: {e}")
 
-print('test')
-
 if __name__ == "__main__":
     client = httpx.Client(base_url = 'https://sports.yahoo.com/site/api/resource')
     if not os.getenv('DATABASE_URL') or not os.getenv('DATABASE_KEY'):
