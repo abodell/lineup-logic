@@ -1,0 +1,30 @@
+name: Get Team Data Runner
+
+on: 
+  schedule:
+    - cron: "0 4 * * 3"  # Runs every wednesday at 0400
+  workflow_dispatch:
+
+jobs:
+  run-get-team-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+      
+      - name: Run Get Team Data
+        run: |
+          python backend/scripts/get-nfl-team-data.py
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_KEY: ${{ secrets.DATABASE_KEY }}
