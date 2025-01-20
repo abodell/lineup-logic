@@ -36,7 +36,7 @@ def insert_to_supabase(team_data: dict):
                 "team_id": team_data.get('team_id'),
                 "season": team_data.get('season'),
                 "team_name": team_data.get('full_name'),
-                "divison_name": f"{team_data.get('conference_abbr')} {team_data.get('division')}",
+                "division_name": f"{team_data.get('conference_abbr')} {team_data.get('division')}",
                 "conference_name": team_data.get('conference_abbr'),
                 "division_id": team_data.get('division_id'),
                 "conference_id": team_data.get('conference_id'),
