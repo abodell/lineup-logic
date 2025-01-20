@@ -2,7 +2,7 @@ name: Get Player Data Runner
 
 on: 
   schedule:
-    - cron: "0 0 * 1 *"  # Runs monthly
+    - cron: "0 4 * * 3"  # Runs weekly on Wednesday at 0400
   workflow_dispatch:
 
 jobs:
