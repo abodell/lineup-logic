@@ -1,0 +1,31 @@
+name: Get Betting Data Runner
+
+on: 
+  schedule:
+    - cron: "0 8 * * *"  # Runs daily at 0800
+    - cron: "0 20 * * *" # Runs daily at 2000
+  workflow_dispatch:
+
+jobs:
+  run-get-betting-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+      
+      - name: Run Get Betting Data
+        run: |
+          python backend/scripts/get-betting-data.py
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_KEY: ${{ secrets.DATABASE_KEY }}
