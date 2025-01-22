@@ -31,7 +31,7 @@ jobs:
       
       - name: Run Get Game Data
         run: |
-          python backend/scripts/get-weekly-scoreboard
+          python backend/scripts/get-weekly-scoreboard.py
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DATABASE_KEY: ${{ secrets.DATABASE_KEY }}
