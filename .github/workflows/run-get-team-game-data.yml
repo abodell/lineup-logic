@@ -1,4 +1,4 @@
-name: Get Team Data Runner
+name: Get Team and Game Data Runner
 
 on: 
   schedule:
@@ -25,6 +25,13 @@ jobs:
       - name: Run Get Team Data
         run: |
           python backend/scripts/get-nfl-team-data.py
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_KEY: ${{ secrets.DATABASE_KEY }}
+      
+      - name: Run Get Game Data
+        run: |
+          python backend/scripts/get-weekly-scoreboard
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DATABASE_KEY: ${{ secrets.DATABASE_KEY }}
