@@ -10,7 +10,7 @@ async def get_teams(team_id: Optional[str] = Query(None),
                     conference_id: Optional[int] = Query(None),
                     division_id: Optional[int] = Query(None),
                     season: Optional[int] = Query(None),
+                    supabase: AsyncClient = Depends(create_supabase)
     ):
-        supabase = await create_supabase()
         res = await supabase.table('teams').select('*').execute()
         return res

@@ -2,7 +2,8 @@ name: Get Team and Game Data Runner
 
 on: 
   schedule:
-    - cron: "0 4 * * 3"  # Runs every wednesday at 0400
+    - cron: "0 8 * * *"  # Runs daily at 0800
+    - cron: "0 20 * * *" # Runs daily at 2000
   workflow_dispatch:
 
 jobs:

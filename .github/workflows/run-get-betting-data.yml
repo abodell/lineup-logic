@@ -2,8 +2,8 @@ name: Get Betting Data Runner
 
 on: 
   schedule:
-    - cron: "0 8 * * *"  # Runs daily at 0800
-    - cron: "0 20 * * *" # Runs daily at 2000
+    - cron: "15 8 * * *"  # Runs daily at 0815
+    - cron: "15 20 * * *" # Runs daily at 2015
   workflow_dispatch:
 
 jobs:
