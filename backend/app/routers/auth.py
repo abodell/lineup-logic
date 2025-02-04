@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException, Response
-from backend.app.models.auth import UserCredentials
+from fastapi import APIRouter, Depends, HTTPException, Response, Request
+from app.models.auth import UserCredentials, CurrentUser
 from app.services.supabase_client import get_supabase
 from supabase._async.client import AsyncClient
 import app.services.auth as AuthService
@@ -41,3 +41,13 @@ async def logout(response: Response, supabase: AsyncClient = Depends(get_supabas
     response.status_code = 200
     response.body = json.dumps({"message": "Logged Out"}).encode('utf-8')
     return response
+
+@router.get('/current-user')
+async def get_current_user(user = Depends(AuthService.get_current_user)):
+    return CurrentUser(
+        email=user.email,
+        id=user.id,
+        first_name=user.user_metadata.get('first_name'),
+        last_name=user.user_metadata.get('last_name'),
+        created_at=user.created_at
+    )

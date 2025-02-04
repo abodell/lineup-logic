@@ -2,12 +2,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import auth, sleeper, espn, yahoo
 
-app = FastAPI()
+app = FastAPI(root_path='/api')
 
 # Allow CORS for frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # React dev server
+    allow_origin_regex=r"https?:\/\/localhost(:\d+)?",  # React dev server
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
