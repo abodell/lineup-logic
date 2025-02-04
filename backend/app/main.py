@@ -14,7 +14,7 @@ app.add_middleware(
 )
 
 # Include routes
-app.include_router(auth.router)
+app.include_router(auth.router, prefix='/auth')
 app.include_router(sleeper.router)
 app.include_router(espn.router)
 app.include_router(yahoo.router)
