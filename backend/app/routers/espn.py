@@ -22,7 +22,7 @@ def get_league_manager():
     return league_manager
 
 @router.get('/espn/leagues/connect')
-async def get_league(league_id: str = Query(None), year: int = Query(None), espn_s2: str = Query(None), swid: str = Query(None), manager: LeagueManager = Depends(get_league_manager)):
+async def connect_league(league_id: str = Query(None), year: int = Query(None), espn_s2: str = Query(None), swid: str = Query(None), manager: LeagueManager = Depends(get_league_manager)):
     if not league_id or not year or not espn_s2 or not swid:
         raise HTTPException(status_code=400, detail="Must provide league_id, year, espn_s2, and swid")
     

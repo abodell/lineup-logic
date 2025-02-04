@@ -1,5 +1,7 @@
 from app.services.sleeper_api_client import sleeper_client
-from fastapi import APIRouter, Query, HTTPException
+from fastapi import APIRouter, Query, HTTPException, Depends
+from app.services.supabase_client import get_supabase
+from supabase._async.client import AsyncClient
 
 router = APIRouter()
 
@@ -211,14 +213,14 @@ async def get_trending_players(type: str, lookback_hours: int = Query(None), lim
         raise HTTPException(status_code=e.status_code, detail=e.detail)
     
 @router.get('/sleeper/players')
-async def get_players(first_name: str = Query(None), last_name: str = Query(None), player_id: str = Query(None)):
+async def get_players(first_name: str = Query(None), last_name: str = Query(None), player_id: str = Query(None), supabase: AsyncClient = Depends(get_supabase)):
     try:
         if (first_name and last_name):
-            players = await sleeper_client.get_sleeper_player_by_name(first_name, last_name)
+            players = await sleeper_client.get_sleeper_player_by_name(first_name, last_name, supabase)
         elif (player_id):
-            players = await sleeper_client.get_sleeper_player_by_id(player_id)
+            players = await sleeper_client.get_sleeper_player_by_id(player_id, supabase)
         else:
-            players = await sleeper_client.get_all_sleeper_players()
+            players = await sleeper_client.get_all_sleeper_players(supabase)
         
         if not players:
             raise HTTPException(status_code=404, detail="No players found!")

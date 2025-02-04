@@ -1,5 +1,7 @@
+from fastapi import Depends
 import httpx
-from app.services.supabase_client import create_supabase
+from app.services.supabase_client import get_supabase
+from supabase._async.client import AsyncClient
 
 class SleeperAPIClient:
     BASE_URL = 'https://api.sleeper.app/v1'
@@ -94,22 +96,20 @@ class SleeperAPIClient:
         response = await self.client.get(f'/draft/{draft_id}/traded_picks')
         return response.json()
     
-    async def get_all_sleeper_players(self):
+    async def get_all_sleeper_players(self, supabase: AsyncClient = Depends(get_supabase)):
         print('get_all_sleeper_players')
-        supabase_async = await create_supabase()
-        response = await supabase_async.table('players').select("*").execute()
+        print(supabase)
+        response = await supabase.table('players').select("*").execute()
         return response.data
     
-    async def get_sleeper_player_by_name(self, first_name: str, last_name: str):
+    async def get_sleeper_player_by_name(self, first_name: str, last_name: str, supabase: AsyncClient = Depends(get_supabase)):
         print('get_sleeper_player_by_name')
-        supabase_async = await create_supabase()
-        response = await supabase_async.table('players').select('*').ilike('first_name', first_name).ilike('last_name', last_name).execute()
+        response = await supabase.table('players').select('*').ilike('first_name', first_name).ilike('last_name', last_name).execute()
         return response.data
     
-    async def get_sleeper_player_by_id(self, player_id: str):
+    async def get_sleeper_player_by_id(self, player_id: str, supabase: AsyncClient = Depends(get_supabase)):
         print('get_sleeper_player_by_id')
-        supabase_async = await create_supabase()
-        response = await supabase_async.table('players').select('*').ilike('player_id', player_id).execute()
+        response = await supabase.table('players').select('*').ilike('player_id', player_id).execute()
         return response.data
     
     async def get_sleeper_trending_players(self, type: str, lookback_hours: int, limit: int):
