@@ -2,5 +2,16 @@
     background: url('/background.jpg') no-repeat center center;
     background-size: cover;
     height: 80vh;
-  }
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #f8f9fa;
+  padding: 10px 0;
+  text-align: center;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1)
+}
   
