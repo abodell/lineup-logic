@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Modal, Button } from "react-bootstrap";
-import SleeperForm from "./forms/SleeperForm";
-import ESPNForm from "./forms/ESPNForm";
+import SleeperForm from "../forms/SleeperForm";
+import ESPNForm from "../forms/ESPNForm";
 
 interface ConnectLeagueModalProps {
     show: boolean
@@ -34,7 +34,7 @@ const ConnectLeagueModal: React.FC<ConnectLeagueModalProps> = ({ show, handleClo
                         </Button>
                     </div>
                 )}
-                {selectedPlatform === "sleeper" && <SleeperForm onBack={() => setSelectedPlatform("main")} />}
+                {selectedPlatform === "sleeper" && <SleeperForm onBack={() => setSelectedPlatform("main")} onCloseModal={handleClose}/>}
                 {selectedPlatform === "espn" && <ESPNForm onBack={() => setSelectedPlatform("main")} />}
             </Modal.Body>
         </Modal>

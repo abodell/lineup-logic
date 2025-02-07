@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Container, Row, Col, Card, Button, Spinner } from 'react-bootstrap'
 import { useAuth } from '../context/AuthContext'
 import { Link } from 'react-router-dom';
-import ConnectLeagueModal from '../components/ConnectLeagueModal';
+import ConnectLeagueModal from '../components/modals/ConnectLeagueModal';
 
 interface League {
     id: string

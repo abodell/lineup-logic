@@ -3,8 +3,8 @@ import React, { useState } from 'react';
 import { Navbar, Nav, Container, Button, Dropdown } from 'react-bootstrap';
 import { useAuth } from '../context/AuthContext'
 import { Link } from 'react-router-dom';
-import LoginModal from './LoginModal';
-import SignupModal from './SignupModal';
+import LoginModal from './modals/LoginModal';
+import SignupModal from './modals/SignupModal';
 import { FaRegUser } from 'react-icons/fa'
 
 const Navigation: React.FC = () => {
