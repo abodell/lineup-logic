@@ -1,0 +1,24 @@
+from fastapi import Depends, HTTPException
+from app.services.supabase_client import get_supabase
+from supabase._async.client import AsyncClient
+from espn_api.football import League
+import app.services.auth as AuthService
+
+async def get_espn_league(supabase: AsyncClient = Depends(get_supabase), current_user = Depends(AuthService.get_current_user)) -> League:
+    try:
+        result = await supabase.table('espn_leagues').select('*').eq('id', current_user.id).execute()
+
+        if not result.data:
+            raise HTTPException(status_code=404, detail="ESPN League Credentials Not Found.  Please connect your league first!")
+        
+        credentials = result.data[0]
+
+        return League(
+            league_id=credentials['league_id'],
+            year=credentials['year'],
+            espn_s2=credentials['espn_s2'],
+            swid=credentials['swid']
+        )
+    
+    except Exception as e:
+        return HTTPException(status_code=500, detail = str(e))

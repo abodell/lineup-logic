@@ -10,6 +10,7 @@ from espn_api.football import League
 from espn_api.football.box_score import BoxScore
 from typing import List, Literal, Optional
 from app.services.supabase_client import get_supabase
+from app.services.espn import get_espn_league
 from supabase._async.client import AsyncClient
 import app.services.auth as AuthService
 
@@ -69,11 +70,11 @@ async def save_espn_league_info(
 
 
 @router.get('/espn/current-week')
-async def get_current_week(manager: LeagueManager = Depends(get_league_manager)):
-    if not manager.league:
+async def get_current_week(league: League = Depends(get_espn_league)):
+    if not league:
         raise HTTPException(status_code=404, detail="Your league must be connected first!")
     
-    return JSONResponse(content = {"current_week": manager.league.current_week})
+    return JSONResponse(content = {"current_week": league.current_week})
 
 @router.get('/espn/leagues/recent-activity')
 async def get_recent_activity(size: int = Query(25), msg_type: str = Query(None), offset: int = Query(0), manager: LeagueManager = Depends(get_league_manager)):
