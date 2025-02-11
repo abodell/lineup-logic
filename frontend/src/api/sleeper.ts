@@ -6,6 +6,14 @@ export const saveSleeperUser = async (data: SleeperRequest) => {
         throw new Error('Username is required')
     }
     
-    const response = await axiosInstance.post(`/api/sleeper/user?username=${data.username}`)
+    const response = await axiosInstance.post('/api/sleeper/user', 
+        null,
+        {
+            params: {
+                username: data.username,
+                year: data.year
+            }
+        }
+    )
     return response.data
 }

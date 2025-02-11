@@ -9,11 +9,18 @@ interface SleeperFormProps {
 }
 
 const SleeperForm: React.FC<SleeperFormProps> = ({ onBack, onCloseModal }) => {
-    const [username, setUsername] = useState("");
+    const [formData, setFormData] = useState({
+        username: "",
+        year: Number(new Date().getFullYear())
+    })
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
 
     const handleSubmit = async () => {
         try {
-            await saveSleeperUser({ username })
+            await saveSleeperUser({ ...formData })
             toast.success("Sleeper account connected!")
     
             setTimeout(() => {
@@ -32,9 +39,19 @@ const SleeperForm: React.FC<SleeperFormProps> = ({ onBack, onCloseModal }) => {
                     <Form.Label>Sleeper Username</Form.Label>
                     <Form.Control
                         type="text"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        name="username"
+                        value={formData.username}
+                        onChange={handleChange}
                         placeholder="Enter Sleeper Username"
+                    />
+                </Form.Group>
+                <Form.Group>
+                    <Form.Label>Year</Form.Label>
+                    <Form.Control
+                        type="number"
+                        name="year"
+                        value={formData.year}
+                        onChange={handleChange}
                     />
                 </Form.Group>
                 <div className="mt-3 d-flex justify-content-between">

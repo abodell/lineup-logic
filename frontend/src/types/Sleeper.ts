@@ -1,7 +1,7 @@
 export interface SleeperRequest {
     username?: string
     user_id?: string
-    season?: string
+    year?: number
     league_id?: string
     week?: string
     league_name?: string
