@@ -35,7 +35,7 @@ const ConnectLeagueModal: React.FC<ConnectLeagueModalProps> = ({ show, handleClo
                     </div>
                 )}
                 {selectedPlatform === "sleeper" && <SleeperForm onBack={() => setSelectedPlatform("main")} onCloseModal={handleClose}/>}
-                {selectedPlatform === "espn" && <ESPNForm onBack={() => setSelectedPlatform("main")} />}
+                {selectedPlatform === "espn" && <ESPNForm onBack={() => setSelectedPlatform("main")} onCloseModal={handleClose} />}
             </Modal.Body>
         </Modal>
     );

@@ -1,25 +1,38 @@
 import { useState } from "react";
 import { Form, Button } from "react-bootstrap";
+import { saveESPNLeague } from "../../api/espn";
+import toast from "react-hot-toast";
 
 interface ESPNFormProps {
     onBack: () => void
+    onCloseModal: () => void
 }
 
-const ESPNForm: React.FC<ESPNFormProps> = ({ onBack }) => {
+const ESPNForm: React.FC<ESPNFormProps> = ({ onBack, onCloseModal }) => {
     const [formData, setFormData] = useState({
-        leagueId: "",
-        year: "",
+        league_id: "",
+        year: Number(new Date().getFullYear()),
         swid: "",
-        s2: ""
+        espn_s2: ""
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = () => {
-        console.log("ESPN Data Submitted:", formData);
-        // Send data to API here
+    const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault()
+        try {
+            await saveESPNLeague({ ...formData })
+            toast.success("ESPN league connected!")
+    
+            setTimeout(() => {
+                onCloseModal()
+                window.location.reload()
+            }, 2000)
+        } catch (err) {
+            console.error("Error submitting ESPN form:", err)
+        }
     };
 
     return (
@@ -28,8 +41,8 @@ const ESPNForm: React.FC<ESPNFormProps> = ({ onBack }) => {
                 <Form.Label>League ID</Form.Label>
                 <Form.Control
                     type="text"
-                    name="leagueId"
-                    value={formData.leagueId}
+                    name="league_id"
+                    value={formData.league_id}
                     onChange={handleChange}
                     placeholder="Enter League ID"
                 />
@@ -58,14 +71,14 @@ const ESPNForm: React.FC<ESPNFormProps> = ({ onBack }) => {
                 <Form.Label>S2</Form.Label>
                 <Form.Control
                     type="text"
-                    name="s2"
-                    value={formData.s2}
+                    name="espn_s2"
+                    value={formData.espn_s2}
                     onChange={handleChange}
                     placeholder="Enter S2"
                 />
             </Form.Group>
             <p className="mt-2">
-                <a href="https://example.com" target="_blank" rel="noopener noreferrer">
+                <a href="https://github.com/cwendt94/espn-api/discussions/150" target="_blank" rel="noopener noreferrer">
                     Where do I find this info?
                 </a>
             </p>
