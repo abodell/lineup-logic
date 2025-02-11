@@ -3,6 +3,7 @@ from fastapi import APIRouter, Query, HTTPException, Depends, Cookie
 from app.services.supabase_client import get_supabase
 from supabase._async.client import AsyncClient
 from typing import Optional
+import app.services.auth as AuthService
 
 router = APIRouter()
 
@@ -22,28 +23,23 @@ async def get_user(username: str = Query(None), user_id: str = Query(None)):
     
     except HTTPException as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)
-# Update this route to have the current user dependency
+
 @router.post('/sleeper/user', tags=['sleeper'])
-async def save_sleeper_user(username: str = Query(None), supabase: AsyncClient = Depends(get_supabase), access_token: Optional[str] = Cookie(None, alias="access_token")):
+async def save_sleeper_user(username: str = Query(None), year: int = Query(None), supabase: AsyncClient = Depends(get_supabase), current_user = Depends(AuthService.get_current_user)):
     if not username:
         raise HTTPException(status_code=400, detail="Must provide username or user_id!")
-
-    if not access_token:
-        raise HTTPException(status_code=401, detail="Not Authenticated")
     
     try:
-        user = await supabase.auth.get_user(access_token)
-        user_id = user.user.id
-
         sleeper_user = await sleeper_client.get_sleeper_user_by_username(username)
         
         sleeper_data = {
-            'id': user_id,
+            'id': current_user.id,
             'sleeper_username': sleeper_user.get('username'),
-            'sleeper_user_id': sleeper_user.get('user_id')
+            'sleeper_user_id': sleeper_user.get('user_id'),
+            'year': year
         }
 
-        result = await supabase.table("sleeper_users").upsert(sleeper_data).execute()
+        result = await supabase.table("sleeper_leagues").upsert(sleeper_data).execute()
         return result.data
 
     except Exception as e:
