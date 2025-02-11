@@ -43,6 +43,7 @@ async def get_current_user(request: Request, supabase: AsyncClient = Depends(get
         raise HTTPException(status_code=401, detail="Not Authenticated")
     
     user = await supabase.auth.get_user(access_token)
+    
     if not user:
         raise HTTPException(status_code=401, detail = "Invalid Token")
     

@@ -22,7 +22,7 @@ async def get_user(username: str = Query(None), user_id: str = Query(None)):
     
     except HTTPException as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)
-
+# Update this route to have the current user dependency
 @router.post('/sleeper/user', tags=['sleeper'])
 async def save_sleeper_user(username: str = Query(None), supabase: AsyncClient = Depends(get_supabase), access_token: Optional[str] = Cookie(None, alias="access_token")):
     if not username:

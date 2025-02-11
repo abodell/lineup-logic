@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Query, HTTPException, Depends
+from fastapi import APIRouter, Query, HTTPException, Depends, Cookie
 from app.models.espn import (
     MatchupScoreboard, TeamScoreboard, 
     BoxPlayer, WeekScoreboard, LeagueTeams, 
@@ -8,7 +8,10 @@ from app.models.espn import (
 from fastapi.responses import JSONResponse
 from espn_api.football import League
 from espn_api.football.box_score import BoxScore
-from typing import List, Literal
+from typing import List, Literal, Optional
+from app.services.supabase_client import get_supabase
+from supabase._async.client import AsyncClient
+import app.services.auth as AuthService
 
 
 router = APIRouter()
@@ -20,7 +23,7 @@ league_manager = LeagueManager()
 
 def get_league_manager():
     return league_manager
-
+# I think I need to refactor how this works
 @router.get('/espn/leagues/connect')
 async def connect_league(league_id: str = Query(None), year: int = Query(None), espn_s2: str = Query(None), swid: str = Query(None), manager: LeagueManager = Depends(get_league_manager)):
     if not league_id or not year or not espn_s2 or not swid:
@@ -32,6 +35,38 @@ async def connect_league(league_id: str = Query(None), year: int = Query(None), 
         return JSONResponse(content = res_content, status_code=200)
     except Exception as e:
         raise Exception(e)
+
+@router.post('/espn/leagues/connect')
+async def save_espn_league_info(
+    league_id: str = Query(None),
+    year: int = Query(None),
+    espn_s2: str = Query(None),
+    swid: str = Query(None),
+    supabase: AsyncClient = Depends(get_supabase),
+    current_user = Depends(AuthService.get_current_user)
+):
+    if not league_id or not year or not espn_s2 or not swid:
+        raise HTTPException(status_code=400, detail="Must provide league_id, year, espn_s2, and swid")
+    
+    try:
+        league = League(league_id = league_id, year = year, espn_s2 = espn_s2, swid = f'{{{swid}}}')
+
+        if league:
+            espn_data = {
+                "id": current_user.id,
+                "league_id": league_id,
+                "year": year,
+                "espn_s2": espn_s2,
+                "swid": swid
+            }
+
+            result = await supabase.table('espn_leagues').upsert(espn_data).execute()
+            return result.data
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+
 
 @router.get('/espn/current-week')
 async def get_current_week(manager: LeagueManager = Depends(get_league_manager)):
