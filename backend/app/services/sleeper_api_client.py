@@ -2,6 +2,7 @@ from fastapi import Depends
 import httpx
 from app.services.supabase_client import get_supabase
 from supabase._async.client import AsyncClient
+from app.models.sleeper import SleeperLeague
 
 class SleeperAPIClient:
     BASE_URL = 'https://api.sleeper.app/v1'
@@ -35,6 +36,35 @@ class SleeperAPIClient:
         print('get_sleeper_league_rosters')
         response = await self.client.get(f'/league/{league_id}/rosters')
         return response.json()
+    
+    async def get_sleeper_roster_by_id(self, user_id: str, year: str):
+        # get the user's leagues for a year
+        leagues = await self.get_sleeper_leagues(user_id, year)
+
+        data = []
+
+        for league in leagues:
+            response = await self.get_sleeper_league_rosters(league.get('league_id'))
+            users = await self.get_sleeper_league_users(league.get('league_id'))
+            roster = next(
+                (roster for roster in response if roster['owner_id'] == user_id),
+                None
+            )
+            user = next(
+                (user for user in users if user['user_id'] == user_id)
+            )
+
+            print(roster)
+            
+            data.append(SleeperLeague(
+                name=league.get('name'),
+                num_teams=int(league['settings']['num_teams']),
+                wins=int(roster['settings']['wins']),
+                losses=int(roster['settings']['losses']),
+                team_name=user.get('display_name')
+            ))
+
+        return data
     
     async def get_sleeper_league_users(self, league_id: str):
         print('get_sleeper_league_users')

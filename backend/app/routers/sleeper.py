@@ -45,6 +45,19 @@ async def save_sleeper_user(username: str = Query(None), year: int = Query(None)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.get('/sleeper/leagues/{user_id}/{year}')
+async def get_sleeper_user_leagues(user_id: str, year: str):
+    if not user_id or not year:
+        raise HTTPException(status_code=404, detail="Must provide user_id and year!")
+    
+    try:
+        response = await sleeper_client.get_sleeper_roster_by_id(user_id, year)
+
+        return response
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @router.get('/sleeper/users/{user_id}/drafts/{season}')
 async def get_user_drafts(user_id: str, season: str):
     if not user_id:
@@ -77,6 +90,7 @@ async def get_league_rosters(league_id: str):
         raise HTTPException(status_code=400, detail="Must provide league_id")
     
     try:
+        test = await sleeper_client.get_sleeper_roster_by_id(league_id, '869416227347546112', '2023')
         rosters = await sleeper_client.get_sleeper_league_rosters(league_id)
         return rosters
     except HTTPException as e:
