@@ -58,6 +58,14 @@ async def get_sleeper_user_leagues(user_id: str, year: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.get('/sleeper/userinfo/{user_id}')
+async def get_sleeper_user_info(user_id: str, supabase: AsyncClient = Depends(get_supabase)):
+    try:
+        result = await supabase.table('sleeper_leagues').select('sleeper_user_id', 'year').eq('id', user_id).execute()
+        return result.data
+    except Exception as e:
+        return HTTPException(status_code=500, detail=str(e))
+
 @router.get('/sleeper/users/{user_id}/drafts/{season}')
 async def get_user_drafts(user_id: str, season: str):
     if not user_id:

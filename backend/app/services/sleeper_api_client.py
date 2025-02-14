@@ -3,6 +3,7 @@ import httpx
 from app.services.supabase_client import get_supabase
 from supabase._async.client import AsyncClient
 from app.models.sleeper import SleeperLeague
+import asyncio
 
 class SleeperAPIClient:
     BASE_URL = 'https://api.sleeper.app/v1'
@@ -44,17 +45,20 @@ class SleeperAPIClient:
         data = []
 
         for league in leagues:
-            response = await self.get_sleeper_league_rosters(league.get('league_id'))
-            users = await self.get_sleeper_league_users(league.get('league_id'))
+            # return all rosters and users in the league
+            rosters, users = await asyncio.gather(
+                self.get_sleeper_league_rosters(league.get('league_id')),
+                self.get_sleeper_league_teams(league.get('league_id'))
+            )
+            # get the roster associated to the user_id
             roster = next(
-                (roster for roster in response if roster['owner_id'] == user_id),
+                (roster for roster in rosters if roster['owner_id'] == user_id),
                 None
             )
+            # get the user's team associated to the user_id
             user = next(
                 (user for user in users if user['user_id'] == user_id)
             )
-
-            print(roster)
             
             data.append(SleeperLeague(
                 name=league.get('name'),
@@ -66,7 +70,7 @@ class SleeperAPIClient:
 
         return data
     
-    async def get_sleeper_league_users(self, league_id: str):
+    async def get_sleeper_league_teams(self, league_id: str):
         print('get_sleeper_league_users')
         response = await self.client.get(f'/league/{league_id}/users')
         return response.json()
