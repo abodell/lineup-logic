@@ -10,7 +10,7 @@ from espn_api.football import League
 from espn_api.football.box_score import BoxScore
 from typing import List, Literal, Optional
 from app.services.supabase_client import get_supabase
-from app.services.espn import get_espn_league
+import app.services.espn as ESPNService
 from supabase._async.client import AsyncClient
 import app.services.auth as AuthService
 
@@ -43,22 +43,26 @@ async def save_espn_league_info(
     year: int = Query(None),
     espn_s2: str = Query(None),
     swid: str = Query(None),
+    team_name: str = Query(None),
     supabase: AsyncClient = Depends(get_supabase),
     current_user = Depends(AuthService.get_current_user)
 ):
-    if not league_id or not year or not espn_s2 or not swid:
-        raise HTTPException(status_code=400, detail="Must provide league_id, year, espn_s2, and swid")
+    if not league_id or not year or not espn_s2 or not swid or not team_name:
+        raise HTTPException(status_code=400, detail="Must provide league_id, year, espn_s2, swid, and team_name")
     
     try:
         league = League(league_id = league_id, year = year, espn_s2 = espn_s2, swid = f'{{{swid}}}')
 
         if league:
+            team_id = await ESPNService.find_team_by_name(league.teams, team_name)
+
             espn_data = {
                 "id": current_user.id,
                 "league_id": league_id,
                 "year": year,
                 "espn_s2": espn_s2,
-                "swid": swid
+                "swid": swid,
+                "team_id": team_id
             }
 
             result = await supabase.table('espn_leagues').upsert(espn_data).execute()
@@ -67,10 +71,16 @@ async def save_espn_league_info(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-
+@router.get('/espn/userinfo/{user_id}')
+async def get_espn_user_info(user_id: str, supabase: AsyncClient = Depends(get_supabase)):
+    try:
+        result = await supabase.table('espn_leagues').select('league_id', 'espn_s2', 'swid', 'year').eq('id', user_id).execute()
+        return result.data
+    except Exception as e:
+        return HTTPException(status_code=500, detail=str(e))
 
 @router.get('/espn/current-week')
-async def get_current_week(league: League = Depends(get_espn_league)):
+async def get_current_week(league: League = Depends(ESPNService.get_espn_league)):
     if not league:
         raise HTTPException(status_code=404, detail="Your league must be connected first!")
     

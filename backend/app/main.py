@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import auth, sleeper, espn, yahoo
+from app.routers import auth, sleeper, espn, yahoo, leagues
 
 app = FastAPI(root_path='/api')
 
@@ -18,6 +18,7 @@ app.include_router(auth.router, prefix='/auth')
 app.include_router(sleeper.router)
 app.include_router(espn.router)
 app.include_router(yahoo.router)
+app.include_router(leagues.router)
 
 @app.get('/')
 def home():

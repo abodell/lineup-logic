@@ -22,3 +22,17 @@ async def get_espn_league(supabase: AsyncClient = Depends(get_supabase), current
     
     except Exception as e:
         return HTTPException(status_code=500, detail = str(e))
+
+async def get_espn_user_info(user_id: str, supabase: AsyncClient = Depends(get_supabase)):
+    try:
+        espn_leagues = await supabase.table('espn_leagues').select('league_id', 'year', 'espn_s2', 'swid').eq('id', user_id).execute()
+        return espn_leagues.data
+    except Exception as e:
+        return HTTPException(status_code=500, detail=str(e))
+    
+async def find_team_by_name(team_list: list, team_name: str):
+    for team in team_list:
+        print(team.__dict__.get('team_id') == team_name)
+        if team.__dict__.get('team_name') == team_name:
+            return team.__dict__.get('team_id')
+    return None

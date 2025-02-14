@@ -1,4 +1,4 @@
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 import httpx
 from app.services.supabase_client import get_supabase
 from supabase._async.client import AsyncClient
@@ -18,6 +18,13 @@ class SleeperAPIClient:
     async def get_sleeper_user_by_id(self, user_id: str):
         response = await self.client.get(f'/user/{user_id}')
         return response.json()
+    
+    async def get_sleeper_user_info(self, user_id: str, supabase: AsyncClient = Depends(get_supabase)):
+        try:
+            sleeper_leagues = await supabase.table('sleeper_leagues').select('sleeper_user_id', 'year').eq('id', user_id).execute()
+            return sleeper_leagues.data
+        except Exception as e:
+            return HTTPException(status_code=500, detail=str(e))
     
     async def get_sleeper_user_id(self, username: str):
         response = await self.get_sleeper_user_by_username(username)
