@@ -19,3 +19,4 @@ async def get_league_info(user_id: str, current_user = Depends(AuthService.get_c
     
     except Exception as e:
         return HTTPException(status_code=500, detail=str(e))
+

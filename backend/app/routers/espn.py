@@ -55,14 +55,15 @@ async def save_espn_league_info(
 
         if league:
             team_id = await ESPNService.find_team_by_name(league.teams, team_name)
-
+            owner_id = await ESPNService.get_owner_id(league.teams, team_name)
             espn_data = {
                 "id": current_user.id,
                 "league_id": league_id,
                 "year": year,
                 "espn_s2": espn_s2,
                 "swid": swid,
-                "team_id": team_id
+                "team_id": team_id,
+                "owner_id": owner_id
             }
 
             result = await supabase.table('espn_leagues').upsert(espn_data).execute()

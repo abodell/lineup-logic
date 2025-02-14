@@ -32,7 +32,12 @@ async def get_espn_user_info(user_id: str, supabase: AsyncClient = Depends(get_s
     
 async def find_team_by_name(team_list: list, team_name: str):
     for team in team_list:
-        print(team.__dict__.get('team_id') == team_name)
         if team.__dict__.get('team_name') == team_name:
             return team.__dict__.get('team_id')
+    return None
+
+async def get_owner_id(team_list, team_name):
+    for team in team_list:
+        if team.__dict__.get('team_name') == team_name:
+            return team.__dict__.get('owners')[0].get('id')
     return None
