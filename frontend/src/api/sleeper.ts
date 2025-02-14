@@ -17,3 +17,23 @@ export const saveSleeperUser = async (data: SleeperRequest) => {
     )
     return response.data
 }
+
+export const getSleeperInfo = async (data: SleeperRequest) => {
+    if (!data.user_id) {
+        throw new Error("User ID required")
+    }
+
+    const response = await axiosInstance.get(`/api/sleeper/userinfo/${data.user_id}`)
+
+    return response.data
+}
+
+export const getSleeperLeagues = async (data: SleeperRequest) => {
+    if (!data.user_id || !data.year) {
+        throw new Error("User ID and Year are required")
+    }
+
+    const response = await axiosInstance.get(`/api/sleeper/leagues/${data.user_id}/${data.year}`)
+
+    return response.data
+}
