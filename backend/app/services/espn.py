@@ -3,6 +3,7 @@ from app.services.supabase_client import get_supabase
 from supabase._async.client import AsyncClient
 from espn_api.football import League
 import app.services.auth as AuthService
+from app.models.espn import ESPNLeague
 
 async def get_espn_league(supabase: AsyncClient = Depends(get_supabase), current_user = Depends(AuthService.get_current_user)) -> League:
     try:
@@ -22,10 +23,25 @@ async def get_espn_league(supabase: AsyncClient = Depends(get_supabase), current
     
     except Exception as e:
         return HTTPException(status_code=500, detail = str(e))
+    
+async def get_espn_league_data(league_id: str, year: int, espn_s2: str, swid: str, team_id: str):
+    try:
+        league = League(league_id, year, espn_s2, swid)
+        team = league.get_team_data(team_id).__dict__
+
+        return ESPNLeague(
+            name=league.settings.name,
+            num_teams=int(league.settings.team_count),
+            wins=team.get('wins'),
+            losses=team.get('losses'),
+            team_name=team.get('team_name')
+        )
+    except Exception as e:
+        return HTTPException(status_code=500, detail=str(e))
 
 async def get_espn_user_info(user_id: str, supabase: AsyncClient = Depends(get_supabase)):
     try:
-        espn_leagues = await supabase.table('espn_leagues').select('league_id', 'year', 'espn_s2', 'swid').eq('id', user_id).execute()
+        espn_leagues = await supabase.table('espn_leagues').select('league_id', 'year', 'espn_s2', 'swid', 'team_id').eq('id', user_id).execute()
         return espn_leagues.data
     except Exception as e:
         return HTTPException(status_code=500, detail=str(e))

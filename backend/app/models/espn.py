@@ -145,3 +145,10 @@ class MatchupScoreboard(BaseModel):
 
 class WeekScoreboard(BaseModel):
     scores: List[MatchupScoreboard]
+
+class ESPNLeague(BaseModel):
+    name: str
+    num_teams: int
+    wins: int
+    losses: int
+    team_name: str

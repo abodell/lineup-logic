@@ -13,6 +13,7 @@ from app.services.supabase_client import get_supabase
 import app.services.espn as ESPNService
 from supabase._async.client import AsyncClient
 import app.services.auth as AuthService
+import asyncio
 
 
 router = APIRouter()
@@ -54,8 +55,7 @@ async def save_espn_league_info(
         league = League(league_id = league_id, year = year, espn_s2 = espn_s2, swid = f'{{{swid}}}')
 
         if league:
-            team_id = await ESPNService.find_team_by_name(league.teams, team_name)
-            owner_id = await ESPNService.get_owner_id(league.teams, team_name)
+            team_id, owner_id = await asyncio.gather(ESPNService.find_team_by_name(league.teams, team_name), owner_id = await ESPNService.get_owner_id(league.teams, team_name))
             espn_data = {
                 "id": current_user.id,
                 "league_id": league_id,
