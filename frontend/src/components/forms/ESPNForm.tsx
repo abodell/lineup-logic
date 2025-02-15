@@ -13,7 +13,8 @@ const ESPNForm: React.FC<ESPNFormProps> = ({ onBack, onCloseModal }) => {
         league_id: "",
         year: Number(new Date().getFullYear()),
         swid: "",
-        espn_s2: ""
+        espn_s2: "",
+        team_name: ""
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,6 +38,16 @@ const ESPNForm: React.FC<ESPNFormProps> = ({ onBack, onCloseModal }) => {
 
     return (
         <Form>
+            <Form.Group>
+                <Form.Label>Team Name</Form.Label>
+                <Form.Control
+                    type="text"
+                    name="team_name"
+                    value={formData.team_name}
+                    onChange={handleChange}
+                    placeholder="Enter Team Name"
+                />
+            </Form.Group>
             <Form.Group>
                 <Form.Label>League ID</Form.Label>
                 <Form.Control

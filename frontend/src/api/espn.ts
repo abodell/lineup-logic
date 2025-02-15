@@ -1,7 +1,7 @@
 import axiosInstance from "../utils/apiService";
 import { ESPNRequest } from "../types/Espn";
 
-export const saveESPNLeague= async (data: ESPNRequest) => {
+export const saveESPNLeague = async (data: ESPNRequest) => {
     if (!data.espn_s2 || !data.league_id || !data.swid || !data.year) {
         throw new Error("Missing ESPN data!")
     }
@@ -13,10 +13,22 @@ export const saveESPNLeague= async (data: ESPNRequest) => {
                 espn_s2: data.espn_s2,
                 league_id: data.league_id,
                 swid: data.swid,
-                year: data.year
+                year: data.year,
+                team_name: data.team_name,
+                owner_id: data.owner_id
             }
         }
     )
+
+    return response.data
+}
+
+export const getESPNInfo = async (data: ESPNRequest) => {
+    if (!data.user_id) {
+        throw new Error("Must provide User ID")
+    }
+
+    const response = await axiosInstance.get(`/api/espn/userinfo/${data.user_id}`)
 
     return response.data
 }

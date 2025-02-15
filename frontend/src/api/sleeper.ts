@@ -22,7 +22,7 @@ export const getSleeperInfo = async (data: SleeperRequest) => {
     if (!data.user_id) {
         throw new Error("User ID required")
     }
-
+    
     const response = await axiosInstance.get(`/api/sleeper/userinfo/${data.user_id}`)
 
     return response.data

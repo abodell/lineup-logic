@@ -2,103 +2,117 @@ import React, { useEffect, useState } from 'react'
 import { Container, Row, Col, Card, Button, Spinner } from 'react-bootstrap'
 import { useAuth } from '../context/AuthContext'
 import ConnectLeagueModal from '../components/modals/ConnectLeagueModal';
-import { getSleeperLeagues } from '../api/sleeper';
-import { useSleeperInfo } from '../hooks/useSleeperInfo';
+import { getLeagues } from '../api/leagues';
+import { League } from '../types/Leagues';
 
-interface League {
-    name: string
-    num_teams: number
-    wins: number
-    losses: number
-    team_name: string
-}
 
 const Account: React.FC = () => {
     const { user } = useAuth()
-    const [leagues, setLeagues] = useState<League[]>([])
-    const { info } = useSleeperInfo(user?.id || "")
+    const [leagues, setLeagues] = useState<League | null>(null)
     const [showModal, setShowModal] = useState(false)
-    const [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(false)
 
-    useEffect(() => {
+    useEffect( () => {
         const fetchLeagues = async () => {
-            if (!user || !info || info.length == 0) {
-                setLoading(false)
-                return
-            }
-
+            setLoading(true)
             try {
-                const leaguePromises = info.map((leagueInfo: { sleeper_user_id: string; year: number }) => {
-                    return getSleeperLeagues({user_id: leagueInfo.sleeper_user_id, year: leagueInfo.year })
-                })
-                
-                const results = await Promise.all(leaguePromises)
-                setLeagues(results[0])
+                const res = await getLeagues({ user_id: user?.id })
+                setLeagues(res)
             } catch (err) {
                 console.error("Error fetching leagues:", err)
             } finally {
                 setLoading(false)
             }
         }
-        fetchLeagues()
-    }, [user, info])
+        
+        if (user?.id) {
+            fetchLeagues()
+        }
+    }, [user])
+
+    console.log(leagues?.sleeper)
 
     return (
-        <Container className="mt-3 pt-5">
+        <Container className="mt-4 pt-5">
             <h2 className="mb-4 text-center">Leagues</h2>
+
+            <Row className="justify-content-center mb-4">
+                <Col className="d-flex justify-content-center">
+                    <Card className="h-100 border-primary text-center shadow-lg rounded-3" style={{ minWidth: "20rem" }}>
+                        <Card.Body className="d-flex flex-column justify-content-center align-items-center">
+                            <Card.Title className="mb-3">Connect a New League</Card.Title>
+                            <Button variant="outline-primary" size="lg" onClick={() => setShowModal(true)}>
+                                Connect
+                            </Button>
+                        </Card.Body>
+                    </Card>
+                </Col>
+            </Row>
+
+            {/* Show spinner while league cards are loading */}
             {loading ? (
                 <div className="text-center">
                     <Spinner animation="border" />
                 </div>
             ) : (
-                <>
-                <Row className="justify-content-center mb-4">
-                    { /* Card for connecting a new league */ }
-                    <Col className="d-flex justify-content-center">
-                        <Card className="h-100 border-primary text-center">
-                            <Card.Body className="d-flex flex-column justify-content-center align-items-center">
-                                <Card.Title>Connect a New League</Card.Title>
-                                <Button variant="outline-primary" onClick={() => setShowModal(true)}>
-                                    Connect
-                                </Button>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                </Row>
-                    { /* Render a card for each connected league */ }
-                <Row className="g-5 justify-content-center">
-                    {leagues.map((league, index) => (
-                        <Col key={index} className="d-flex justify-content-center">
-                            <Card className="h-100" style={{minWidth: "18rem"}}>
-                                <Card.Header className="d-flex align-items-center justify-content-center gap-3 bg-white">
+                <Row className="g-4 justify-content-center">
+                    {leagues?.espn?.map((league, index) => (
+                        <Col key={`espn-${index}`} className="d-flex justify-content-center">
+                            <Card className="h-100 shadow-lg rounded-3 border-0" style={{ minWidth: "20rem", maxWidth: "24rem" }}>
+                                <Card.Header className="d-flex align-items-center justify-content-center gap-3 bg-transparent">
                                     <img
-                                        src="/sleeper.jpeg"
-                                        alt="Sleeper Logo"
-                                        style={{height: '35px', marginRight: '8px', borderRadius: '10px'}}
+                                        src="/espn.jpeg"
+                                        alt="ESPN Logo"
+                                        style={{ height: '40px', borderRadius: '10px' }}
                                     />
-                                    <h6>{league.name}</h6>
+                                    <h5 className="mb-0">{league.name}</h5>
                                 </Card.Header>
-                                <Card.Body>
+                                <Card.Body className="text-center">
+                                    <div className="mb-2">
+                                        <strong>Owner:</strong> {league.team_name}
+                                    </div>
                                     <div className="mb-2">
                                         <strong>Record:</strong> {league.wins} - {league.losses}
                                     </div>
                                     <div className="mb-2">
-                                        <strong>Teams:</strong>{league.num_teams}
+                                        <strong>Teams:</strong> {league.num_teams}
                                     </div>
-                                    <div>
+                                </Card.Body>
+                            </Card>
+                        </Col>
+                    ))}
+                    {leagues?.sleeper?.map((league, index) => (
+                        <Col key={`sleeper-${index}`} className="d-flex justify-content-center">
+                            <Card className="h-100 shadow-lg rounded-3 border-0" style={{ minWidth: "20rem", maxWidth: "24rem" }}>
+                                <Card.Header className="d-flex align-items-center justify-content-center gap-3 bg-transparent">
+                                    <img
+                                        src="/sleeper.jpeg"
+                                        alt="Sleeper Logo"
+                                        style={{ height: '40px', borderRadius: '10px' }}
+                                    />
+                                    <h5 className="mb-0">{league.name}</h5>
+                                </Card.Header>
+                                <Card.Body className="text-center">
+                                    <div className="mb-2">
                                         <strong>Owner:</strong> {league.team_name}
+                                    </div>
+                                    <div className="mb-2">
+                                        <strong>Record:</strong> {league.wins} - {league.losses}
+                                    </div>
+                                    <div className="mb-2">
+                                        <strong>Teams:</strong> {league.num_teams}
                                     </div>
                                 </Card.Body>
                             </Card>
                         </Col>
                     ))}
                 </Row>
-            </>
             )}
-            { /* Modal Component */ }
+
+            {/* Modal Component */}
             <ConnectLeagueModal show={showModal} handleClose={() => setShowModal(false)} />
         </Container>
-    )
-}
+    );
+};
 
 export default Account
