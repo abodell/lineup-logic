@@ -54,7 +54,7 @@ async def get_current_week(supabase: AsyncClient = Depends(get_supabase)):
 @router.get('/nfl/recent-games')
 async def get_recent_games(supabase: AsyncClient = Depends(get_supabase)):
         try:
-                response = await supabase.table('games').select("*, home_team:teams!Games_home_team_id_season_fkey(team_name), away_team:teams!Games_away_team_id_season_fkey(team_name)").limit(10).execute()
+                response = await supabase.table('games').select("*, home_team:teams!Games_home_team_id_season_fkey(team_abbr), away_team:teams!Games_away_team_id_season_fkey(team_abbr)").limit(10).execute()
 
                 return response.data
         except Exception as e:
