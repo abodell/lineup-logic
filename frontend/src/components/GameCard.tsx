@@ -1,47 +1,42 @@
-import React from 'react'
-import { Card, Row, Col } from 'react-bootstrap'
+import React from 'react';
+import { Card, Row, Col } from 'react-bootstrap';
 
 interface GameCardProps {
-    homeTeam: string
-    awayTeam: string
-    homeScore: number
-    awayScore: number
-    date: string
-    gameType: string
+    homeTeam: string;
+    awayTeam: string;
+    homeScore: number;
+    awayScore: number;
+    date: string;
+    gameType: string;
 }
 
 const GameCard: React.FC<GameCardProps> = ({ homeTeam, awayTeam, homeScore, awayScore, date, gameType }) => {
     return (
-        <Card className="mb-3 shadow-sm text-center mx-auto" style={{ width: '16rem' }}>
-            <Card.Header className="bg-light py-2 bg-transparent border-0">
-                <h6 className="mb-1">{gameType}</h6>
-                <small className="text-muted">{date}</small>
+        <Card className="h-100 shadow-sm" style={{ width: '100%' }}>
+            <Card.Header className="bg-transparent border-0 py-2 text-center">
+                <div className="d-flex flex-column" style={{ minHeight: '70px' }}>
+                    <h6 className="mb-1">{gameType}</h6>
+                    <small className="text-muted">{date}</small>
+                </div>
             </Card.Header>
-            <Card.Body className="py-3">
-                <Row className="align-items-center g-5">
-                    {/* Home Team Column */}
-                    <Col xs={6} className="text-end">
-                        <div className="d-flex flex-column align-items-end">
-                            <div className="mb-2" style={{ height: '48px', display: 'flex', alignItems: 'center' }}>
-                                <small className="fw-semibold text-end">{homeTeam}</small>
-                            </div>
-                            <span className="fs-5 fw-bold">{homeScore}</span>
+            <Card.Body className="py-2">
+                <Row className="align-items-center justify-content-center">
+                    <Col xs={5} className="text-align">
+                        <div className="mb-2" style={{ minHeight: '40px' }}>
+                            <small className="fw-semibold">{homeTeam}</small>
                         </div>
+                        <span className="fs-5 fw-bold">{homeScore}</span>
                     </Col>
-                    
-                    {/* Away Team Column */}
-                    <Col xs={6} className="text-start">
-                        <div className="d-flex flex-column align-items-start">
-                            <div className="mb-2" style={{ height: '48px', display: 'flex', alignItems: 'center' }}>
-                                <small className="fw-semibold text-start">{awayTeam}</small>
-                            </div>
-                            <span className="fs-5 fw-bold">{awayScore}</span>
+                    <Col xs={5} className="text-align">
+                        <div className="mb-2" style={{ minHeight: '40px' }}>
+                            <small className="fw-semibold">{awayTeam}</small>
                         </div>
+                        <span className="fs-5 fw-bold">{awayScore}</span>
                     </Col>
                 </Row>
             </Card.Body>
         </Card>
-    )
-}
+    );
+};
 
-export default GameCard
+export default GameCard;

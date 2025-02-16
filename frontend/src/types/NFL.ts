@@ -9,5 +9,5 @@ export interface Game {
 }
 
 export interface Team {
-    team_name: string
+    team_abbr: string
 }
