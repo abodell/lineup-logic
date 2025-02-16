@@ -56,6 +56,7 @@ const Account: React.FC = () => {
                 </div>
             ) : (
                 <Row className="g-4 justify-content-center">
+                    { /* Eventually need to make the cards a componenet */ }
                     {leagues?.espn?.map((league, index) => (
                         <Col key={`espn-${index}`} className="d-flex justify-content-center">
                             <Card className="h-100 shadow-lg rounded-3 border-0" style={{ minWidth: "20rem", maxWidth: "24rem" }}>

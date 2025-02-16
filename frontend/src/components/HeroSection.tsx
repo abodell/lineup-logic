@@ -1,5 +1,5 @@
 import React from 'react'
-import { Container, Button } from 'react-bootstrap'
+import { Container } from 'react-bootstrap'
 import '../styles/custom.css'
 
 const HeroSection: React.FC = () => {
@@ -8,9 +8,6 @@ const HeroSection: React.FC = () => {
             <Container>
                 <h1 className="display-4 text-primary">Welcome to Lineup Logic</h1>
                 <p className="lead text-secondary">Play smarter, win bigger</p>
-                <Button variant="primary" size="lg">
-                    Get Started
-                </Button>
             </Container>
         </div>
     )
