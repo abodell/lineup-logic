@@ -8,9 +8,11 @@ router = APIRouter()
 async def get_recent_betting_data(supabase: AsyncClient = Depends(get_supabase)):
     try:
         response = await supabase.table('latest_betting_lines').select('away_ml, home_ml, away_spread, home_spread, away_line, home_line, total, over_line, under_line, ' 
-                    'game:games!game_id(home_team_id, away_team_id, home_team:teams!Games_home_team_id_season_fkey(team_abbr), away_team:teams!Games_away_team_id_season_fkey(team_abbr))') \
+                    'game:games!game_id(home_team_id, away_team_id, start_time, home_team:teams!Games_home_team_id_season_fkey(team_abbr), away_team:teams!Games_away_team_id_season_fkey(team_abbr))') \
                     .limit(10) \
                     .execute()
+        
+        print(response.data)
 
         return response.data
 
