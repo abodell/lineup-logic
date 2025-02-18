@@ -56,7 +56,7 @@ const CustomCarousel: React.FC<ResponsiveCarouselProps> = ({
   if (!children.length) return null;
 
   return (
-    <Container fluid className={`py-3 position-relative mt-5 ${className}`}>
+    <Container fluid className={`position-relative mt-3 ${className}`}>
       <Row className="justify-content-center">
         {visibleItems.map((item, index) => (
           <Col key={index} xs={12} sm={6} lg={4} className="mb-3 d-flex justify-content-center">

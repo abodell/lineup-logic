@@ -15,14 +15,14 @@ const Navigation: React.FC = () => {
 
   return (
     <>
-      <Navbar bg="light" expand="lg" fixed="top" className="w-100 shadow">
+      <Navbar bg="light" expand="lg" fixed="top" className="w-100 shadow-sm">
         <Container>
           <Navbar.Brand as={Link} to='/'>Lineup Logic</Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ms-auto align-items-center">
-              <Nav.Link as={Link} to="/features">Features</Nav.Link>
-              <Nav.Link as={Link} to="/pricing">Pricing</Nav.Link>
+              <Nav.Link as={Link} to="/leagues">Leagues</Nav.Link>
+              <Nav.Link as={Link} to="/betting">Betting</Nav.Link>
               <Nav.Link as={Link} to="/about">About</Nav.Link>
               <Nav.Link as={Link} to="/contact">Contact</Nav.Link>
               { /* If user is not logged in, show login and create account buttons */ }

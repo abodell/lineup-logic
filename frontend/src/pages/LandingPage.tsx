@@ -33,11 +33,13 @@ const LandingPage: React.FC = () => {
   return (
     <Container fluid className="px-0">
       {gameCards.length > 0 && (
-        <CustomCarousel>
-          {gameCards}
-        </CustomCarousel>
+        <>
+            <CustomCarousel>
+            {gameCards}
+            </CustomCarousel>
+            <HeroSection />
+        </>
       )}
-      <HeroSection />
     </Container>
   );
 };
