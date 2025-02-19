@@ -11,6 +11,9 @@ export interface BettingGame {
     total: number
     under_line: number
     game: BettingTeam
+    winning_ml_bet: string
+    winning_total_bet: string
+    winning_spread_bet: string
 }
 
 export interface BettingTeam {

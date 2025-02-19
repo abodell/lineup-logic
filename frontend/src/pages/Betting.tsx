@@ -33,9 +33,9 @@ const Betting: React.FC = () => {
                     <Spinner animation="border" />
                 </div>
             ) : (
-                <Row className="justify-content-center">
+                <Row className="justify-content-center align-items-center g-4">
                     {bettingData.map((game, index) => (
-                        <Col key={index} md={6} lg={4} className="p-3">
+                        <Col key={index} md={7} lg={5} className="g-4">
                             <BettingCard
                                 homeTeam={game.game.home_team.team_abbr}
                                 awayTeam={game.game.away_team.team_abbr}
@@ -47,6 +47,9 @@ const Betting: React.FC = () => {
                                 homeML={game.home_ml}
                                 awayML={game.away_ml}
                                 gameDate={new Date(game.game.start_time).toLocaleDateString()}
+                                winningML={game.winning_ml_bet}
+                                winningSpread={game.winning_spread_bet}
+                                winningTotal={game.winning_total_bet}
                             />
                         </Col>
                     ))}
